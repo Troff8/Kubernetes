@@ -1,0 +1,30 @@
+# Приложение при получении GET запроса сохраняет ip и задает рандомный номер запросу, возвращает обновленную таблицу
+git clone 
+docker compose up  #запуск контейнера
+localhost:8000 # return json
+# Данные останутся в бд после перезапуска контейнеров
+docker compose down
+docker compose up
+localhost:8000
+
+
+
+# prac2 -------------------------
+git clone
+minikube delete
+minikube start
+cd app 
+docker build . -t front/app:v2  
+minikube image load front/app:v2  
+minikube image ls - чекнули
+kubectl get ns  - пространство всех имен
+kubectl create ns test - создали новое, по дефолту будет default namespace
+kubectl get ns    - чекнули и убедились
+cd .. - вышли из app
+kubectl apply -f bd.yaml -n test - создали под bd и его сервис в namespace test
+ждем пока поднимется... 3 2 1
+kubectl get all -n test - посмотрели что все status running
+kubectl apply -f front.yaml -n test  - создаем под front
+kubectl get all -n test  - посмотрели что все status running
+kubectl port-forward -n test pod/frontend-pod --address 0.0.0.0 8000:8000 - выводим адрес из виртуалки на хост, чтобы пробить curl на хосте
+curl 127.0.0.1:8000 - стучимся к серваку и получаем в ответе json

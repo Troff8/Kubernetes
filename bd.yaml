@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  labels:
+    app: backend
+spec:
+  containers:
+    - name: backend
+      image: mysql
+      args: ["--default-authentication-plugin=mysql_native_password"]
+      ports:
+        - containerPort: 3306
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "troff"
+        - name: MYSQL_DATABASE
+          value: "troff"
+      volumeMounts:
+        - name: db-storage
+          mountPath: /var/lib/mysql
+        - name: init-sql
+          mountPath: /docker-entrypoint-initdb.d
+  volumes:
+    - name: db-storage
+      hostPath:
+        path: /Users/ilatrofimov/Desktop/prac2/prac/db
+    - name: init-sql
+      configMap:
+        name: mysql-initdb-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    CREATE TABLE new_table (id  int not null auto_increment, ip varchar(15), random_number int not null, primary key(id));
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
